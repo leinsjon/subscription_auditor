@@ -1,0 +1,24 @@
+{
+  "updated": "2026-10-23",
+  "active": [
+    { "id": "disney-hulu", "name": "Disney+, Hulu Bundle Premium", "category": "Streaming", "price": 21.99, "cycle": "monthly", "renews": "2026-11-07", "source": "receipt", "note": "New price from Nov 7, 2026" },
+    { "id": "netflix", "name": "Netflix Premium (4K)", "category": "Streaming", "price": 26.99, "cycle": "monthly", "renews": null, "source": "market" },
+    { "id": "youtube-tv", "name": "YouTube TV Base", "category": "Streaming", "price": 82.99, "cycle": "monthly", "renews": null, "source": "market" },
+    { "id": "nfl-sunday-ticket", "name": "NFL Sunday Ticket", "category": "Sports", "price": 378.00, "cycle": "yearly", "renews": "2027-08-01", "approx": true, "source": "market", "note": "Returning YouTube TV member price" },
+    { "id": "icloud", "name": "iCloud+ 2 TB", "category": "Cloud storage", "price": 9.99, "cycle": "monthly", "renews": "2026-10-30", "source": "receipt" },
+    { "id": "google-one", "name": "Google One 200 GB", "category": "Cloud storage", "price": 2.99, "cycle": "monthly", "renews": "2026-11-07", "source": "receipt" },
+    { "id": "pikkit", "name": "Pikkit Plus", "category": "Apps", "price": 99.99, "cycle": "yearly", "renews": "2026-11-08", "source": "receipt" },
+    { "id": "claude", "name": "Claude (Anthropic)", "category": "AI", "price": 200.00, "cycle": "yearly", "renews": "2027-09-26", "source": "receipt" },
+    { "id": "chatgpt", "name": "ChatGPT Plus", "category": "AI", "price": 20.00, "cycle": "monthly", "renews": null, "source": "you" },
+    { "id": "dashlane", "name": "Dashlane", "category": "Apps", "price": 65.00, "cycle": "yearly", "renews": "2027-10-15", "approx": true, "source": "you", "expensed": true, "note": "Expensed through work" },
+    { "id": "uber-one", "name": "Uber One", "category": "Memberships", "price": 96.00, "cycle": "yearly", "renews": "2027-06-30", "source": "receipt", "note": "Amex credited this year's fee back" },
+    { "id": "plum-health", "name": "Plum Health DPC", "category": "Health", "price": 240.00, "cycle": "monthly", "renews": "2026-11-01", "source": "receipt" }
+  ],
+  "cancelled": [
+    { "id": "apple-tv", "name": "Apple TV", "category": "Streaming", "price": 12.99, "cycle": "monthly", "ended": "2026-09-10" },
+    { "id": "paramount-plus", "name": "Paramount+ Essential", "category": "Streaming", "price": null, "cycle": "monthly", "ended": "2026-08-11" },
+    { "id": "truthfinder", "name": "TruthFinder", "category": "Apps", "price": null, "cycle": "monthly", "ended": "2026-08-09" },
+    { "id": "studio-classes", "name": "Studio class pack (4 classes/month)", "category": "Fitness", "price": null, "cycle": "monthly", "ended": "2026-08-20" },
+    { "id": "fanduel-sports", "name": "FanDuel Sports Network", "category": "Sports", "price": null, "cycle": "monthly", "ended": "2026-08-31", "note": "Service shut down" }
+  ]
+}

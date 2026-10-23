@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#16171a" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Subscriptions">
+<title>Subscription Auditor</title>
+<style>
+  :root {
+    --bg: #f6f5f2;
+    --card: #ffffff;
+    --text: #1d1d1f;
+    --muted: #6b6b70;
+    --line: #e4e2dc;
+    --accent: #2f6f5e;
+    --accent-soft: #e3efe9;
+    --warn: #a4501b;
+    --warn-soft: #fbeadf;
+    --off: #9a9aa0;
+    --track: #d9d7d0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #16171a;
+      --card: #202226;
+      --text: #f0efeb;
+      --muted: #9b9ca2;
+      --line: #32343a;
+      --accent: #6cc3a6;
+      --accent-soft: #23362f;
+      --warn: #f0a46f;
+      --warn-soft: #3b2a1f;
+      --off: #6d6e74;
+      --track: #3a3c42;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  main { max-width: 560px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 15px; font-weight: 600; color: var(--muted); margin: 8px 0 4px; letter-spacing: .02em; }
+  h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 28px 0 10px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+  .total { padding: 18px; }
+  .total .big { font-size: 40px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .total .big small { font-size: 16px; font-weight: 500; color: var(--muted); }
+  .total .sub { color: var(--muted); font-size: 14px; margin-top: 2px; }
+  .savings { margin-top: 12px; padding: 10px 12px; border-radius: 10px; background: var(--warn-soft); color: var(--warn); font-size: 14px; font-weight: 500; }
+  .alerts .alert { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  .alerts .alert:last-child { border-bottom: 0; }
+  .alerts .when { color: var(--warn); font-weight: 600; white-space: nowrap; }
+  .cats { padding: 14px; display: grid; gap: 12px; }
+  .cat-row { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; font-size: 14px; }
+  .cat-row .amt { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .bar { grid-column: 1 / -1; height: 6px; border-radius: 3px; background: var(--track); overflow: hidden; }
+  .bar span { display: block; height: 100%; background: var(--accent); border-radius: 3px; }
+  .list { display: grid; gap: 10px; }
+  .sub-item { padding: 14px; display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: start; }
+  .sub-item.off { opacity: .55; }
+  .sub-item.off .price { text-decoration: line-through; }
+  .name { font-weight: 600; }
+  .price { font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .price small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+  .meta { color: var(--muted); font-size: 13px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; background: var(--accent-soft); color: var(--accent); }
+  .chip.work { background: var(--line); color: var(--muted); }
+  .chip.soon { background: var(--warn-soft); color: var(--warn); }
+  .toggle-row { grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; font-size: 14px; }
+  .toggle-row .hint { color: var(--warn); font-size: 13px; }
+  .switch { position: relative; width: 48px; height: 28px; flex: none; }
+  .switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+  .switch .knob { position: absolute; inset: 0; border-radius: 99px; background: var(--track); transition: background .15s; }
+  .switch .knob::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.25); transition: transform .15s; }
+  .switch input:checked + .knob { background: var(--accent); }
+  .switch input:checked + .knob::after { transform: translateX(20px); }
+  .switch input:focus-visible + .knob { outline: 2px solid var(--accent); outline-offset: 2px; }
+  details summary { cursor: pointer; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details summary h2 { display: inline; }
+  details summary::after { content: " ▸"; color: var(--muted); font-size: 13px; }
+  details[open] summary::after { content: " ▾"; }
+  .past { padding: 12px 14px; display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .past:last-child { border-bottom: 0; }
+  .past .meta { margin-top: 2px; }
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin: 28px 0 12px; }
+  .error { padding: 16px; color: var(--warn); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Subscriptions</h1>
+  <div id="app"></div>
+  <footer id="foot"></footer>
+</main>
+<script>
+(function () {
+  var DAY = 86400000;
+  var SOON_DAYS = 7;
+  var STORE_KEY = "sub-auditor:using";
+
+  function loadUsing() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; }
+  }
+  function saveUsing(map) {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(map)); } catch (e) {}
+  }
+
+  function money(n) {
+    return "$" + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+  function monthly(s) { return s.cycle === "yearly" ? s.price / 12 : s.price; }
+  function parseDate(str) {
+    var p = str.split("-").map(Number);
+    return new Date(p[0], p[1] - 1, p[2]);
+  }
+  function today() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+
+  // Roll a stored renewal date forward by its billing cycle until it is today or later.
+  function nextRenewal(s) {
+    if (!s.renews) return null;
+    var d = parseDate(s.renews), now = today();
+    var guard = 0;
+    while (d < now && guard++ < 240) {
+      if (s.cycle === "yearly") d.setFullYear(d.getFullYear() + 1);
+      else d.setMonth(d.getMonth() + 1);
+    }
+    return d;
+  }
+  function daysUntil(d) { return Math.round((d - today()) / DAY); }
+  function fmtDate(d, approx) {
+    if (approx) return "~" + d.toLocaleDateString(undefined, { month: "short", year: "numeric" });
+    return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: d.getFullYear() !== today().getFullYear() ? "numeric" : undefined });
+  }
+  function whenText(d, approx) {
+    if (approx) return fmtDate(d, true);
+    var n = daysUntil(d);
+    if (n === 0) return "Today";
+    if (n === 1) return "Tomorrow";
+    return "In " + n + " days";
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function render(data) {
+    var using = loadUsing();
+    var app = document.getElementById("app");
+    app.innerHTML = "";
+
+    var subs = data.active.map(function (s) {
+      var next = nextRenewal(s);
+      return Object.assign({}, s, { next: next, using: using[s.id] !== false });
+    });
+    subs.sort(function (a, b) {
+      if (!a.next && !b.next) return a.name.localeCompare(b.name);
+      if (!a.next) return 1;
+      if (!b.next) return -1;
+      return a.next - b.next;
+    });
+
+    var counted = subs.filter(function (s) { return !s.expensed; });
+    var totalMonthly = counted.reduce(function (t, s) { return t + monthly(s); }, 0);
+    var unused = counted.filter(function (s) { return !s.using; });
+    var savings = unused.reduce(function (t, s) { return t + monthly(s); }, 0);
+
+    // Summary
+    var total = el("div", "card total");
+    var big = el("div", "big", money(totalMonthly));
+    big.appendChild(el("small", null, " / month"));
+    total.appendChild(big);
+    total.appendChild(el("div", "sub", money(totalMonthly * 12) + " a year across " + counted.length + " subscriptions"));
+    if (unused.length) {
+      total.appendChild(el("div", "savings",
+        "Not using " + unused.length + (unused.length === 1 ? " subscription" : " subscriptions") +
+        ". Cancelling would save " + money(savings) + "/month."));
+    }
+    app.appendChild(total);
+
+    // Renewals in the next week
+    var soon = subs.filter(function (s) { return s.next && !s.approx && daysUntil(s.next) <= SOON_DAYS; });
+    if (soon.length) {
+      app.appendChild(el("h2", null, "Renewing this week"));
+      var box = el("div", "card alerts");
+      soon.forEach(function (s) {
+        var row = el("div", "alert");
+        var left = el("div");
+        left.appendChild(el("div", "name", s.name));
+        left.appendChild(el("div", "meta", money(s.price) + (s.cycle === "yearly" ? " / year" : " / month")));
+        row.appendChild(left);
+        row.appendChild(el("div", "when", whenText(s.next)));
+        box.appendChild(row);
+      });
+      app.appendChild(box);
+    }
+
+    // Category totals
+    var cats = {};
+    counted.forEach(function (s) { cats[s.category] = (cats[s.category] || 0) + monthly(s); });
+    var catList = Object.keys(cats).map(function (k) { return [k, cats[k]]; }).sort(function (a, b) { return b[1] - a[1]; });
+    var maxCat = catList.length ? catList[0][1] : 1;
+    app.appendChild(el("h2", null, "By category, per month"));
+    var catBox = el("div", "card cats");
+    catList.forEach(function (c) {
+      var row = el("div", "cat-row");
+      row.appendChild(el("div", null, c[0]));
+      row.appendChild(el("div", "amt", money(c[1])));
+      var bar = el("div", "bar");
+      var fill = el("span");
+      fill.style.width = Math.max(2, (c[1] / maxCat) * 100) + "%";
+      bar.appendChild(fill);
+      row.appendChild(bar);
+      catBox.appendChild(row);
+    });
+    app.appendChild(catBox);
+
+    // Active subscriptions, soonest renewal first
+    app.appendChild(el("h2", null, "Active, by next renewal"));
+    var list = el("div", "list");
+    subs.forEach(function (s) {
+      var item = el("div", "card sub-item" + (s.using ? "" : " off"));
+      var left = el("div");
+      left.appendChild(el("div", "name", s.name));
+      var meta = el("div", "meta");
+      meta.appendChild(el("span", "chip", s.category));
+      if (s.expensed) meta.appendChild(el("span", "chip work", "Work expense"));
+      if (s.next) {
+        var soonish = !s.approx && daysUntil(s.next) <= SOON_DAYS;
+        if (soonish) meta.appendChild(el("span", "chip soon", whenText(s.next)));
+        meta.appendChild(el("span", null, "Renews " + fmtDate(s.next, s.approx)));
+      } else {
+        meta.appendChild(el("span", null, "Renewal date unknown"));
+      }
+      left.appendChild(meta);
+      if (s.note) left.appendChild(el("div", "meta", s.note));
+      item.appendChild(left);
+
+      var price = el("div", "price", money(s.price));
+      price.appendChild(el("small", null, s.cycle === "yearly" ? "per year · " + money(s.price / 12) + "/mo" : "per month"));
+      item.appendChild(price);
+
+      var toggleRow = el("label", "toggle-row");
+      var label = el("span", null, "Still using this");
+      if (!s.using) label = el("span", "hint", "Not using. Consider cancelling.");
+      toggleRow.appendChild(label);
+      var sw = el("span", "switch");
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = s.using;
+      input.setAttribute("aria-label", "Still using " + s.name);
+      input.addEventListener("change", function () {
+        var map = loadUsing();
+        if (input.checked) delete map[s.id]; else map[s.id] = false;
+        saveUsing(map);
+        render(data);
+      });
+      sw.appendChild(input);
+      sw.appendChild(el("span", "knob"));
+      toggleRow.appendChild(sw);
+      item.appendChild(toggleRow);
+      list.appendChild(item);
+    });
+    app.appendChild(list);
+
+    // Turned off
+    if (data.cancelled && data.cancelled.length) {
+      var det = document.createElement("details");
+      var sum = document.createElement("summary");
+      sum.appendChild(el("h2", null, "Turned off (" + data.cancelled.length + ")"));
+      det.appendChild(sum);
+      var past = el("div", "card");
+      data.cancelled.slice().sort(function (a, b) { return b.ended.localeCompare(a.ended); }).forEach(function (s) {
+        var row = el("div", "past");
+        var left = el("div");
+        left.appendChild(el("div", "name", s.name));
+        var meta = el("div", "meta");
+        meta.appendChild(el("span", "chip", s.category));
+        meta.appendChild(el("span", null, "Ended " + fmtDate(parseDate(s.ended)) + (s.note ? " · " + s.note : "")));
+        left.appendChild(meta);
+        row.appendChild(left);
+        row.appendChild(el("div", "price", s.price != null ? money(s.price) : "—"));
+        past.appendChild(row);
+      });
+      det.appendChild(past);
+      app.appendChild(det);
+    }
+
+    document.getElementById("foot").textContent =
+      "List updated " + fmtDate(parseDate(data.updated)) + ". Your toggles are saved on this device.";
+  }
+
+  fetch("subscriptions.json", { cache: "no-store" })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(render)
+    .catch(function () {
+      var app = document.getElementById("app");
+      app.innerHTML = "";
+      app.appendChild(el("div", "card error", "Couldn't load subscriptions.json."));
+    });
+})();
+</script>
+</body>
+</html>

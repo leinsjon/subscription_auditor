@@ -115,6 +115,15 @@
       "cycle": "monthly",
       "renews": "2026-11-01",
       "source": "receipt"
+    },
+    {
+      "id": "adobe-cc",
+      "name": "Adobe Creative Cloud",
+      "category": "Apps",
+      "price": 16.0,
+      "cycle": "monthly",
+      "renews": null,
+      "source": "you"
     }
   ],
   "cancelled": [

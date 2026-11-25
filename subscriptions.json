@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-28",
+  "updated": "2026-10-31",
   "active": [
     {
       "id": "disney-hulu",
@@ -66,6 +66,16 @@
       "cycle": "yearly",
       "renews": "2026-11-08",
       "source": "receipt"
+    },
+    {
+      "id": "chess-com",
+      "name": "Chess.com",
+      "category": "Games",
+      "price": 109.0,
+      "cycle": "yearly",
+      "renews": "2027-10-31",
+      "source": "you",
+      "note": "Charged Oct 31, 2026"
     },
     {
       "id": "claude",
